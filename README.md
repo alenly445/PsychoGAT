@@ -34,6 +34,7 @@ cp .env.example .env
 
 ### 3. 运行
 
+模拟器运行：
 ```bash
 # 默认：抑郁倾向模拟
 python run.py
@@ -52,6 +53,12 @@ python run.py --verbose
 
 # 保存完整游戏记录到文件
 python run.py --output example_output/full_game_demo.md
+```
+
+真人交互运行：
+```
+  python web_app.py
+  然后在浏览器打开 http://127.0.0.1:5000
 ```
 
 ## 隐私说明
@@ -80,8 +87,4 @@ python run.py --output example_output/full_game_demo.md
 评估：重度抑郁倾向
 ```
 
-运行方式：
-```
-  python web_app.py
-  然后在浏览器打开 http://127.0.0.1:5000
-```
+
