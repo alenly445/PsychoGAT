@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsychoGAT — 沉浸式心灵探索</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS Variables ===== */
+:root {
+  --bg-body: #080816;
+  --bg-card: rgba(18, 18, 40, 0.85);
+  --bg-card-hover: rgba(28, 28, 56, 0.9);
+  --text-primary: #ede8e0;
+  --text-secondary: #9b94a8;
+  --text-muted: #6b6478;
+  --accent-gold: #d4a84b;
+  --accent-gold-dim: rgba(212, 168, 75, 0.15);
+  --accent-teal: #5ac8b0;
+  --accent-rose: #d46b82;
+  --border-glow: rgba(212, 168, 75, 0.2);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-story: 'Noto Serif SC', Georgia, serif;
+}
+
+/* ===== Reset & Base ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: var(--font-ui);
+  background: var(--bg-body);
+  color: var(--text-primary);
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(60, 30, 90, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(30, 60, 90, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(90, 50, 30, 0.08) 0%, transparent 50%),
+    var(--bg-body);
+}
+
+/* ===== Particles Canvas ===== */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== Container ===== */
+#app {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px;
+  height: 100vh;
+  max-height: 700px;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+/* ===== Screen System ===== */
+.screen {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  animation: fadeIn 0.5s ease;
+}
+.screen.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Start Screen ===== */
+#screen-start {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.start-title {
+  font-family: var(--font-story);
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-gold), #f0d68a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+
+.start-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 48px;
+  letter-spacing: 4px;
+}
+
+.start-form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  border-color: var(--accent-gold);
+}
+
+.form-group select option {
+  background: var(--bg-body);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  padding: 14px 32px;
+  background: linear-gradient(135deg, var(--accent-gold), #c49630);
+  color: #0a0a1a;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  letter-spacing: 2px;
+  margin-top: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(212, 168, 75, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.start-footer {
+  position: absolute;
+  bottom: 24px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+}
+
+.start-footer a {
+  color: var(--accent-gold);
+  text-decoration: none;
+}
+
+/* ===== Loading Screen ===== */
+#screen-loading {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 32px;
+}
+
+.loading-ring {
+  width: 80px;
+  height: 80px;
+  border: 3px solid var(--border-glow);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-family: var(--font-story);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  min-height: 2em;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0%   { content: ''; }
+  25%  { content: '.'; }
+  50%  { content: '..'; }
+  75%  { content: '...'; }
+  100% { content: ''; }
+}
+
+.loading-progress {
+  width: 240px;
+  height: 3px;
+  background: var(--border-glow);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.loading-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), #f0d68a);
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.8s ease;
+}
+
+/* ===== Game Screen ===== */
+#screen-game {
+  gap: 0;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.game-title-bar {
+  font-family: var(--font-story);
+  font-size: 0.9rem;
+  color: var(--accent-gold);
+}
+
+.game-round-info {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.game-round-num {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.game-progress-container {
+  width: 100%;
+  height: 4px;
+  background: var(--border-glow);
+  border-radius: 2px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.game-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-gold), #f0d68a);
+  border-radius: 2px;
+  transition: width 0.6s ease;
+  width: 0%;
+}
+
+.game-dimension {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.game-dimension-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.game-dimension-name {
+  font-size: 0.85rem;
+  color: var(--accent-teal);
+  font-weight: 500;
+}
+
+/* ===== Story Card ===== */
+.story-card {
+  flex: 1;
+  min-height: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  overflow-y: auto;
+  position: relative;
+  backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-glow) transparent;
+}
+
+.story-card::-webkit-scrollbar {
+  width: 4px;
+}
+.story-card::-webkit-scrollbar-thumb {
+  background: var(--border-glow);
+  border-radius: 2px;
+}
+
+.story-text {
+  font-family: var(--font-story);
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  opacity: 0;
+  animation: storyReveal 0.8s ease forwards;
+}
+
+@keyframes storyReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.story-memory {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-glow);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.story-memory summary {
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* ===== Choices ===== */
+.choices-area {
+  display: flex;
+  gap: 12px;
+  padding-top: 20px;
+  flex-shrink: 0;
+}
+
+.choice-btn {
+  flex: 1;
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+
+.choice-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-gold-dim), transparent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.choice-btn:hover::before {
+  opacity: 1;
+}
+
+.choice-btn:hover {
+  border-color: var(--accent-gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.choice-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.choice-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.choice-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== Score Badge ===== */
+.score-badge {
+  text-align: center;
+  padding-top: 12px;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.score-badge span {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* ===== Result Screen ===== */
+#screen-result {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+}
+
+.result-icon {
+  font-size: 3rem;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.result-score-ring {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+}
+
+.result-score-ring svg {
+  transform: rotate(-90deg);
+}
+
+.result-score-ring .bg {
+  fill: none;
+  stroke: var(--border-glow);
+  stroke-width: 6;
+}
+
+.result-score-ring .fill {
+  fill: none;
+  stroke: var(--accent-gold);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.5s ease;
+}
+
+.result-score-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.result-score-num .score {
+  font-family: var(--font-story);
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.result-score-num .total {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.result-level {
+  font-family: var(--font-story);
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 8px 24px;
+  border-radius: 50px;
+  display: inline-block;
+}
+
+.level-normal { color: var(--accent-teal); background: rgba(90, 200, 176, 0.1); }
+.level-mild { color: #e8c84b; background: rgba(232, 200, 75, 0.1); }
+.level-moderate { color: #e8944b; background: rgba(232, 148, 75, 0.1); }
+.level-severe { color: var(--accent-rose); background: rgba(212, 107, 130, 0.1); }
+
+.result-recommendation {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  max-width: 450px;
+}
+
+.result-details {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+}
+
+.result-detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.result-detail-row:last-child {
+  border-bottom: none;
+}
+
+.result-detail-row .name {
+  color: var(--text-secondary);
+}
+
+.result-detail-row .score-tag {
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.score-tag-depressed {
+  background: rgba(212, 107, 130, 0.15);
+  color: var(--accent-rose);
+}
+.score-tag-healthy {
+  background: rgba(90, 200, 176, 0.15);
+  color: var(--accent-teal);
+}
+
+.result-summary {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.result-summary-item {
+  text-align: center;
+}
+
+.result-summary-item .num {
+  font-family: var(--font-story);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: block;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-secondary {
+  padding: 12px 28px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glow);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-gold);
+  background: var(--bg-card-hover);
+}
+
+/* ===== Error Screen ===== */
+#screen-error {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.error-icon {
+  font-size: 3rem;
+}
+
+.error-title {
+  font-family: var(--font-story);
+  font-size: 1.2rem;
+  color: var(--accent-rose);
+}
+
+.error-msg {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+/* ===== Scrollbar for Webkit ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 2px; }
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  #app {
+    padding: 12px;
+    max-height: none;
+    height: 100dvh;
+  }
+  .start-title { font-size: 1.8rem; }
+  .start-subtitle { margin-bottom: 32px; font-size: 0.85rem; }
+  .story-card { padding: 20px; }
+  .story-text { font-size: 0.95rem; }
+  .choices-area { flex-direction: column; gap: 8px; }
+  .choice-btn { padding: 14px 16px; }
+  .game-header { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .game-round-info { text-align: left; }
+  .result-details { padding: 12px 16px; }
+  .result-summary { gap: 16px; flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== Particles ===== -->
+<canvas id="particles"></canvas>
+
+<!-- ===== App Container ===== -->
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="screen-start" class="screen active">
+    <div class="start-title">PsychoGAT</div>
+    <div class="start-subtitle">— 沉浸式心灵探索 —</div>
+    <form class="start-form" id="startForm" onsubmit="return false;">
+      <div class="form-group">
+        <label for="gameType">故事类型</label>
+        <select id="gameType">
+          <option value="奇幻">✨ 奇幻</option>
+          <option value="科幻">🚀 科幻</option>
+          <option value="校园">📚 校园</option>
+          <option value="都市">🌆 都市</option>
+          <option value="古风">🏮 古风</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="gameTopic">故事主题</label>
+        <input id="gameTopic" type="text" value="疗愈之旅" placeholder="输入主题…">
+      </div>
+      <button class="btn-primary" id="btnStart" onclick="startGame()">开始旅程</button>
+    </form>
+    <div class="start-footer">
+      探索内心的微光 · 基于 PsychoGAT 框架
+    </div>
+  </div>
+
+  <!-- LOADING SCREEN -->
+  <div id="screen-loading" class="screen">
+    <div class="loading-ring"></div>
+    <div class="loading-text" id="loadingText">设计师正在编织故事世界<span class="loading-dots"></span></div>
+    <div class="loading-progress">
+      <div class="loading-progress-bar" id="loadingBar"></div>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="screen-game" class="screen">
+    <div class="game-header">
+      <div class="game-title-bar" id="gameTitle"></div>
+      <div class="game-round-info">
+        <span class="game-round-num" id="roundNum">1</span> / <span id="totalRounds">9</span> 轮
+      </div>
+    </div>
+    <div class="game-progress-container">
+      <div class="game-progress-bar" id="progressBar"></div>
+    </div>
+    <div class="game-dimension">
+      <span class="game-dimension-label">当前维度</span>
+      <span class="game-dimension-name" id="dimensionName">—</span>
+    </div>
+    <div class="story-card" id="storyCard">
+      <div class="story-text" id="storyText"></div>
+    </div>
+    <div class="choices-area" id="choicesArea">
+      <button class="choice-btn" id="choice1" onclick="makeChoice(1)">
+        <div class="choice-label">选择 A</div>
+        <div class="choice-text" id="choiceText1"></div>
+      </button>
+      <button class="choice-btn" id="choice2" onclick="makeChoice(2)">
+        <div class="choice-label">选择 B</div>
+        <div class="choice-text" id="choiceText2"></div>
+      </button>
+    </div>
+    <div class="score-badge">当前得分 · <span id="scoreDisplay">0</span> / 9</div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen">
+    <div class="result-icon" id="resultIcon">🔮</div>
+    <div class="result-score-ring" id="scoreRing">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle class="bg" cx="70" cy="70" r="60"/>
+        <circle class="fill" id="scoreCircle" cx="70" cy="70" r="60"
+          stroke-dasharray="377" stroke-dashoffset="377"/>
+      </svg>
+      <div class="result-score-num">
+        <span class="score" id="resultScore">0</span>
+        <span class="total">/ 9</span>
+      </div>
+    </div>
+    <div class="result-level" id="resultLevel">—</div>
+    <div class="result-recommendation" id="resultRecommendation"></div>
+    <div class="result-summary">
+      <div class="result-summary-item">
+        <span class="num" id="healthyCount">0</span>
+        健康方向
+      </div>
+      <div class="result-summary-item">
+        <span class="num" id="depressedCount">0</span>
+        有倾向方向
+      </div>
+    </div>
+    <div class="result-details" id="resultDetails"></div>
+    <div class="result-actions">
+      <button class="btn-secondary" onclick="showStart()">重新开始</button>
+    </div>
+  </div>
+
+  <!-- ERROR SCREEN -->
+  <div id="screen-error" class="screen">
+    <div class="error-icon">⚠️</div>
+    <div class="error-title">出了点问题</div>
+    <div class="error-msg" id="errorMsg">无法连接到服务器，请稍后重试。</div>
+    <button class="btn-primary" onclick="showStart()">返回首页</button>
+  </div>
+
+</div>
+
+<script>
+// ===== Particles Effect =====
+(function() {
+  const canvas = document.getElementById('particles');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let animId;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const COUNT = 50;
+  for (let i = 0; i < COUNT; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2 + 0.5,
+      dx: (Math.random() - 0.5) * 0.3,
+      dy: (Math.random() - 0.5) * 0.3,
+      o: Math.random() * 0.5 + 0.1,
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of particles) {
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(212, 168, 75, ${p.o})`;
+      ctx.fill();
+    }
+    animId = requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ===== App State =====
+let gameId = null;
+let loadingInterval = null;
+
+const LOADING_MESSAGES = [
+  '设计师正在编织故事世界',
+  '控制器正在书写篇章',
+  '评论家正在润色文字',
+  '星光照亮了前方的道路',
+  '故事正在慢慢展开',
+];
+
+const LEVEL_CONFIG = {
+  '正常范围':     { icon: '🌿', cls: 'level-normal' },
+  '轻度抑郁倾向': { icon: '🌙', cls: 'level-mild' },
+  '中重度抑郁倾向': { icon: '🌊', cls: 'level-moderate' },
+  '重度抑郁倾向': { icon: '🌪️', cls: 'level-severe' },
+};
+
+// ===== Screen Management =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== Start =====
+function showStart() {
+  gameId = null;
+  if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+  document.getElementById('btnStart').disabled = false;
+  showScreen('screen-start');
+}
+
+// ===== Start Game =====
+async function startGame() {
+  const btn = document.getElementById('btnStart');
+  btn.disabled = true;
+
+  const gameType = document.getElementById('gameType').value;
+  const gameTopic = document.getElementById('gameTopic').value.trim() || '疗愈之旅';
+
+  showScreen('screen-loading');
+  startLoadingAnimation();
+
+  try {
+    const res = await fetch('/api/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game_type: gameType, game_topic: gameTopic }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      stopLoadingAnimation();
+      showError(data.error || '服务器返回错误');
+      btn.disabled = false;
+      return;
+    }
+
+    gameId = data.game_id;
+    stopLoadingAnimation();
+    renderRound(data);
+
+  } catch (err) {
+    stopLoadingAnimation();
+    showError('网络连接失败，请检查服务器是否运行');
+    btn.disabled = false;
+  }
+}
+
+// ===== Loading Animation =====
+function startLoadingAnimation() {
+  let idx = 0;
+  const el = document.getElementById('loadingText');
+  const bar = document.getElementById('loadingBar');
+  let progress = 0;
+
+  el.textContent = LOADING_MESSAGES[0] + '...';
+
+  loadingInterval = setInterval(() => {
+    idx = (idx + 1) % LOADING_MESSAGES.length;
+    el.textContent = LOADING_MESSAGES[idx] + '...';
+    progress = Math.min(progress + 8, 85);
+    bar.style.width = progress + '%';
+  }, 4000);
+}
+
+function stopLoadingAnimation() {
+  if (loadingInterval) {
+    clearInterval(loadingInterval);
+    loadingInterval = null;
+  }
+  document.getElementById('loadingBar').style.width = '100%';
+}
+
+// ===== Render Round =====
+function renderRound(data) {
+  document.getElementById('gameTitle').textContent = data.game_title || 'PsychoGAT';
+  document.getElementById('roundNum').textContent = data.round;
+  document.getElementById('totalRounds').textContent = data.total_rounds || 9;
+  document.getElementById('progressBar').style.width = (data.round / (data.total_rounds || 9) * 100) + '%';
+  document.getElementById('dimensionName').textContent = data.dimension || '—';
+  document.getElementById('storyText').textContent = data.paragraph || '';
+  document.getElementById('choiceText1').textContent = data.instruction_1 || '';
+  document.getElementById('choiceText2').textContent = data.instruction_2 || '';
+
+  // 启用按钮
+  document.getElementById('choice1').disabled = false;
+  document.getElementById('choice2').disabled = false;
+  document.getElementById('choice1').style.opacity = '1';
+  document.getElementById('choice2').style.opacity = '1';
+
+  // 更新得分
+  if (data.scores_so_far !== undefined) {
+    document.getElementById('scoreDisplay').textContent = data.scores_so_far;
+  }
+
+  // 滚动到顶部
+  document.getElementById('storyCard').scrollTop = 0;
+
+  showScreen('screen-game');
+}
+
+// ===== Make Choice =====
+async function makeChoice(choice) {
+  if (!gameId) return;
+
+  // 禁用按钮，防止重复点击
+  document.getElementById('choice1').disabled = true;
+  document.getElementById('choice2').disabled = true;
+
+  try {
+    const res = await fetch('/api/choice', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ game_id: gameId, choice: choice }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.error) {
+      showError(data.error || '处理选择时出错');
+      return;
+    }
+
+    if (data.completed) {
+      renderResults(data);
+    } else {
+      renderRound(data);
+    }
+
+  } catch (err) {
+    showError('网络连接失败，请检查服务器');
+  }
+}
+
+// ===== Render Results =====
+function renderResults(data) {
+  const total = data.total_score;
+  const severity = data.severity || { level: '—', recommendation: '' };
+  const level = severity.level || '—';
+  const config = LEVEL_CONFIG[level] || { icon: '🔮', cls: '' };
+
+  // 图标
+  document.getElementById('resultIcon').textContent = config.icon;
+
+  // Score circle animation
+  const circle = document.getElementById('scoreCircle');
+  const circumference = 377;
+  const offset = circumference - (total / 9) * circumference;
+  document.getElementById('resultScore').textContent = total;
+
+  setTimeout(() => {
+    circle.style.strokeDashoffset = offset;
+  }, 300);
+
+  // Level
+  const levelEl = document.getElementById('resultLevel');
+  levelEl.textContent = level;
+  levelEl.className = 'result-level ' + config.cls;
+
+  // Recommendation
+  document.getElementById('resultRecommendation').textContent =
+    severity.recommendation || '';
+
+  // Count healthy vs depressed
+  const dims = data.dimensions || [];
+  const healthy = dims.filter(d => d.score === 0).length;
+  const depressed = dims.filter(d => d.score === 1).length;
+  document.getElementById('healthyCount').textContent = healthy;
+  document.getElementById('depressedCount').textContent = depressed;
+
+  // Detail rows
+  const detailsEl = document.getElementById('resultDetails');
+  detailsEl.innerHTML = dims.map(d => `
+    <div class="result-detail-row">
+      <span class="name">${d.round}. ${d.name}</span>
+      <span class="score-tag ${d.score === 1 ? 'score-tag-depressed' : 'score-tag-healthy'}">
+        ${d.score === 1 ? '⚠️ 有倾向' : '✅ 无倾向'} · ${d.score}分
+      </span>
+    </div>
+  `).join('');
+
+  showScreen('screen-result');
+}
+
+// ===== Error =====
+function showError(msg) {
+  document.getElementById('errorMsg').textContent = msg || '未知错误';
+  showScreen('screen-error');
+}
+</script>
+</body>
+</html>
