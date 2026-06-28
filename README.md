@@ -54,6 +54,16 @@ python run.py --verbose
 python run.py --output example_output/full_game_demo.md
 ```
 
+## 在线部署（Render）
+
+一键部署到 Render 免费云服务：
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/alenly445/PsychoGATtest)
+
+1. 点击上方按钮
+2. 在 Render 后台设置 `DEEPSEEK_API_KEY` 环境变量
+3. 部署完成后即可通过公网 URL 访问
+
 ## 隐私说明
 
 - 所有数据仅通过 DeepSeek API 传输，不存储个人身份信息

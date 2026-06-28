@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: psychogat
+    runtime: python
+    repo: https://github.com/alenly445/PsychoGATtest
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn web_app:app --worker-class sync --timeout 120
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: MODEL
+        value: deepseek-chat
+      - key: TEMPERATURE
+        value: "0.7"
+      - key: MAX_TOKENS
+        value: "4096"

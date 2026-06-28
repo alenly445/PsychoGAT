@@ -311,15 +311,17 @@ if __name__ == "__main__":
         print("\n⚠️  配置验证失败，请确保已设置 DEEPSEEK_API_KEY")
         print("   参考 .env.example 创建 .env 文件\n")
 
+    import os
+    port = int(os.getenv("PORT", "5000"))
     print("=" * 50)
     print("  PsychoGAT Web 版启动")
     print(f"  模型: {Config.MODEL}")
-    print(f"  地址: http://127.0.0.1:5000")
+    print(f"  地址: http://0.0.0.0:{port}")
     print("=" * 50)
 
     app.run(
-        host="127.0.0.1",
-        port=5000,
+        host="0.0.0.0",
+        port=port,
         debug=False,
         threaded=True,
     )
