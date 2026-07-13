@@ -7,6 +7,21 @@ from core.llm_client import LLMClient
 from utils.parser import Parser
 
 
+# 年龄段配置
+AGE_GROUP_CONFIG = {
+    "child":  {"name": "儿童/小学生", "range": "6-12岁",
+               "guidance": "\n### 年龄适配要求\n- 语言简单易懂，情节生动有趣\n- 避免过于复杂或黑暗的情节"},
+    "teen":   {"name": "青少年/中学生", "range": "13-17岁",
+               "guidance": "\n### 年龄适配要求\n- 语言富有青春气息，情节热血或感人\n- 可涉及适度的成长困惑"},
+    "young":  {"name": "青年人", "range": "18-30岁",
+               "guidance": "\n### 年龄适配要求\n- 语言有文学质感，情节有一定深度\n- 可探讨人生选择、情感关系等话题"},
+    "middle": {"name": "中年人", "range": "31-50岁",
+               "guidance": "\n### 年龄适配要求\n- 语言沉稳内敛，情节贴近现实生活\n- 可探讨家庭、事业、人生意义"},
+    "elder":  {"name": "老年人", "range": "51岁以上",
+               "guidance": "\n### 年龄适配要求\n- 语言温暖平和，节奏舒缓\n- 围绕回忆、亲情、日常生活展开"},
+}
+
+
 # D2.2 首轮（第0次迭代）提示词
 FIRST_ROUND_SYSTEM_PROMPT = """你是一位沉浸式交互小说作家。你的任务是根据游戏设定，写出故事开篇段落。
 
@@ -25,7 +40,8 @@ FIRST_ROUND_PROMPT_TEMPLATE = """# 游戏设定
 - 游戏标题：{title}
 - 游戏类型：{game_type}
 - 游戏主题：{game_topic}
-
+- 目标受众：{age_group_name}（{age_group_range}）
+{age_guidance}
 ## 故事大纲
 {outline_text}
 
@@ -79,6 +95,9 @@ SUBSEQUENT_ROUND_PROMPT_TEMPLATE = """# 游戏继续
 
 ## 基本信息
 - 游戏标题：{title}
+- 游戏类型：{game_type}
+- 游戏主题：{game_topic}
+- 目标受众：{age_group_name}（{age_group_range}）
 
 ## 故事大纲（参考）
 {outline_text}
@@ -140,6 +159,7 @@ def run_controller(
     is_first_round: bool = False,
     game_type: str = "奇幻",
     game_topic: str = "疗愈之旅",
+    age_group: str = "",
     round_index: int = 0,
     total_rounds: int = 9,
 ) -> dict:
@@ -157,6 +177,7 @@ def run_controller(
         is_first_round: 是否为首轮（第0次迭代）
         game_type: 游戏类型
         game_topic: 游戏主题
+        age_group: 年龄段标识（child, teen, young, middle, elder）
         round_index: 当前轮次索引
 
     Returns:
@@ -171,12 +192,21 @@ def run_controller(
     client = LLMClient()
     outline_text = "\n".join(f"  {i+1}. {node}" for i, node in enumerate(outline))
 
+    # 年龄段信息
+    age_info = AGE_GROUP_CONFIG.get(age_group, {"name": "通用", "range": "全年龄段", "guidance": ""})
+    age_group_name = age_info["name"]
+    age_group_range = age_info["range"]
+    age_guidance = age_info["guidance"]
+
     if is_first_round:
         # 首轮：使用段落格式
         prompt = FIRST_ROUND_PROMPT_TEMPLATE.format(
             title=title,
             game_type=game_type,
             game_topic=game_topic,
+            age_group_name=age_group_name,
+            age_group_range=age_group_range,
+            age_guidance=age_guidance,
             outline_text=outline_text,
             item_question=scale_item["question"],
             total_rounds=total_rounds,
@@ -206,6 +236,10 @@ def run_controller(
 
         prompt = SUBSEQUENT_ROUND_PROMPT_TEMPLATE.format(
             title=title,
+            game_type=game_type,
+            game_topic=game_topic,
+            age_group_name=age_group_name,
+            age_group_range=age_group_range,
             outline_text=outline_text,
             completed_rounds=round_index,
             total_rounds=total_rounds,

@@ -61,7 +61,6 @@ python run.py --output example_output/full_game_demo.md
   然后在浏览器打开 http://127.0.0.1:5000
 ```
 
-
 ## 隐私说明
 
 - 所有数据仅通过 DeepSeek API 传输，不存储个人身份信息
