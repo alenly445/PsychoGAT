@@ -86,5 +86,3 @@ python run.py --output example_output/full_game_demo.md
 总分：9/9
 评估：重度抑郁倾向
 ```
-
-
