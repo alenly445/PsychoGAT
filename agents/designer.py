@@ -16,7 +16,8 @@ DESIGNER_PROMPT_TEMPLATE = """# 游戏设计任务
 ## 基本信息
 - 游戏类型：{game_type}
 - 游戏主题：{game_topic}
-
+- 目标受众年龄段：{age_group_name}（{age_group_range}）
+{age_guidance}
 ## 设计要求
 
 ### 1. 故事设计原则
@@ -84,13 +85,29 @@ DESIGNER_PROMPT_TEMPLATE = """# 游戏设计任务
 """
 
 
-def run_designer(game_type="奇幻", game_topic="疗愈之旅") -> dict:
+# 年龄段配置
+AGE_GROUP_CONFIG = {
+    "child":  {"name": "儿童/小学生", "range": "6-12岁",
+               "guidance": "- 语言简单易懂，情节生动有趣\n- 角色年龄设定为小学生或同龄人\n- 避免过于复杂或黑暗的情节\n- 系列长度控制在10-15分钟可读完"},
+    "teen":   {"name": "青少年/中学生", "range": "13-17岁",
+               "guidance": "- 语言富有青春气息，情节热血或感人\n- 角色年龄设定为中学生\n- 可涉及适度的成长困惑和情感体验\n- 保持积极向上的整体基调"},
+    "young":  {"name": "青年人", "range": "18-30岁",
+               "guidance": "- 语言有文学质感，情节有一定深度\n- 角色年龄设定为大学生或职场新人\n- 可探讨人生选择、情感关系等话题\n- 允许适度的现实复杂性和思辨"},
+    "middle": {"name": "中年人", "range": "31-50岁",
+               "guidance": "- 语言沉稳内敛，情节贴近现实生活\n- 角色年龄设定为有社会阅历的成年人\n- 可探讨家庭、事业、人生意义等主题\n- 叙事风格成熟、有代入感"},
+    "elder":  {"name": "老年人", "range": "51岁以上",
+               "guidance": "- 语言温暖平和，节奏舒缓\n- 角色年龄设定为中老年人\n- 围绕回忆、亲情、日常生活展开\n- 基调温馨，传递智慧与从容"},
+}
+
+
+def run_designer(game_type="奇幻", game_topic="疗愈之旅", age_group="") -> dict:
     """
     设计师智能体：生成游戏配置。
 
     Args:
         game_type: 游戏类型（奇幻、科幻、校园、都市等）
         game_topic: 游戏主题
+        age_group: 年龄段标识（child, teen, young, middle, elder）
 
     Returns:
         dict: {
@@ -102,9 +119,18 @@ def run_designer(game_type="奇幻", game_topic="疗愈之旅") -> dict:
     """
     client = LLMClient()
 
+    # 年龄段信息
+    age_info = AGE_GROUP_CONFIG.get(age_group, {"name": "通用", "range": "全年龄段", "guidance": ""})
+    age_group_name = age_info["name"]
+    age_group_range = age_info["range"]
+    age_guidance = age_info["guidance"]
+
     prompt = DESIGNER_PROMPT_TEMPLATE.format(
         game_type=game_type,
         game_topic=game_topic,
+        age_group_name=age_group_name,
+        age_group_range=age_group_range,
+        age_guidance=age_guidance,
     )
 
     print("  [设计师] 正在生成游戏设计...")

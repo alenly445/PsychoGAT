@@ -30,9 +30,10 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 class GameState:
     """单个游戏的完整状态"""
 
-    def __init__(self, game_type, game_topic):
+    def __init__(self, game_type, game_topic, age_group=""):
         self.game_type = game_type
         self.game_topic = game_topic
+        self.age_group = age_group
         self.game_data = None          # 设计师输出
         self.round = 0                 # 当前轮次 (0-based)
         self.scores = []               # 每轮得分
@@ -113,17 +114,18 @@ def api_start():
     data = request.get_json() or {}
     game_type = data.get("game_type", "奇幻")
     game_topic = data.get("game_topic", "疗愈之旅")
+    age_group = data.get("age_group", "")
 
     # 定期清理过期游戏
     cleanup_old_games()
 
     try:
         # Step 1: 设计师生成游戏配置
-        print(f"[Web] 设计师开始生成，类型={game_type}，主题={game_topic}")
-        game_data = run_designer(game_type=game_type, game_topic=game_topic)
+        print(f"[Web] 设计师开始生成，类型={game_type}，主题={game_topic}，年龄段={age_group}")
+        game_data = run_designer(game_type=game_type, game_topic=game_topic, age_group=age_group)
 
         # Step 2: 初始化状态
-        state = GameState(game_type, game_topic)
+        state = GameState(game_type, game_topic, age_group)
         state.game_data = game_data
 
         # Step 3: 首轮 — 控制器 (is_first_round=True)
@@ -139,6 +141,7 @@ def api_start():
             is_first_round=True,
             game_type=game_type,
             game_topic=game_topic,
+            age_group=age_group,
             round_index=0,
         )
 
@@ -261,6 +264,9 @@ def api_choice():
             prev_paragraph=state.prev_paragraph,
             prev_instruction=state.prev_instruction,
             is_first_round=False,
+            game_type=state.game_type,
+            game_topic=state.game_topic,
+            age_group=state.age_group,
             round_index=state.round,
         )
 
