@@ -175,4 +175,4 @@ def _validate_designer_output(result: dict):
         if word in text:
             print(f'  ⚠️  注意：输出包含禁止词汇"{word}"，但不阻止继续')
 
-    print(f"  [设计师] 验证通过 ✓")
+    print(f"  [设计师] 验证通过 [OK]")

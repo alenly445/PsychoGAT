@@ -128,7 +128,7 @@ def run_full_game(
                 issues = reviews.get(dim_name, {}).get("issues", [])
                 for issue in issues:
                     logger.detail(f"    • [{dim_name}] {issue}")
-        logger.detail(f"[评论家] 优化完成 ✓")
+        logger.detail(f"[评论家] 优化完成 [OK]")
 
         # Step c: 模拟器选择
         context = refined_memory if (not is_first and refined_memory) else summary
