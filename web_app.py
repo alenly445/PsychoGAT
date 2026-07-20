@@ -5,6 +5,12 @@ PsychoGAT Web Application
 
 import sys
 import os
+
+# 解决 Windows GBK 编码问题
+os.environ.setdefault("PYTHONIOENCODING", "utf-8")
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8") if hasattr(sys.stdout, "reconfigure") else None
+
 import uuid
 import time
 import json
@@ -30,10 +36,11 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 class GameState:
     """单个游戏的完整状态"""
 
-    def __init__(self, game_type, game_topic, age_group=""):
+    def __init__(self, game_type, game_topic, age_group="", user_name=""):
         self.game_type = game_type
         self.game_topic = game_topic
         self.age_group = age_group
+        self.user_name = user_name
         self.game_data = None          # 设计师输出
         self.round = 0                 # 当前轮次 (0-based)
         self.scores = []               # 每轮得分
@@ -91,6 +98,54 @@ def delete_game(game_id):
         games.pop(game_id, None)
 
 
+# ===== 数据存储 =====
+
+SAVE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+COUNTER_FILE = os.path.join(SAVE_DIR, "counter.json")
+counter_lock = Lock()
+
+
+def get_next_id():
+    """获取下一个自增问卷编号（线程安全）"""
+    with counter_lock:
+        os.makedirs(SAVE_DIR, exist_ok=True)
+        if os.path.exists(COUNTER_FILE):
+            with open(COUNTER_FILE, "r", encoding="utf-8") as f:
+                counter = json.load(f)
+        else:
+            counter = {"next_id": 1}
+
+        current_id = counter["next_id"]
+        counter["next_id"] += 1
+
+        with open(COUNTER_FILE, "w", encoding="utf-8") as f:
+            json.dump(counter, f, ensure_ascii=False)
+
+        return current_id
+
+
+def save_game_record(game_id, state):
+    """保存完成的问卷记录到文件"""
+    record_id = get_next_id()
+
+    record = {
+        "id": record_id,
+        "name": state.user_name,
+        "score": sum(state.scores),
+        "age_group": state.age_group,
+        "game_type": state.game_type,
+        "game_topic": state.game_topic,
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    file_path = os.path.join(SAVE_DIR, f"{record_id}.json")
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(record, f, ensure_ascii=False, indent=2)
+
+    print(f"  ✅ 问卷 #{record_id} 已保存（{state.user_name}，{record['score']}/9）")
+    return record_id
+
+
 # ===== 路由 =====
 
 @app.route("/")
@@ -115,6 +170,7 @@ def api_start():
     game_type = data.get("game_type", "奇幻")
     game_topic = data.get("game_topic", "疗愈之旅")
     age_group = data.get("age_group", "")
+    user_name = data.get("user_name", "匿名用户")
 
     # 定期清理过期游戏
     cleanup_old_games()
@@ -125,7 +181,7 @@ def api_start():
         game_data = run_designer(game_type=game_type, game_topic=game_topic, age_group=age_group)
 
         # Step 2: 初始化状态
-        state = GameState(game_type, game_topic, age_group)
+        state = GameState(game_type, game_topic, age_group, user_name)
         state.game_data = game_data
 
         # Step 3: 首轮 — 控制器 (is_first_round=True)
@@ -244,9 +300,11 @@ def api_choice():
             result_data = {
                 "completed": True,
                 "total_score": state.results["total_score"],
-                "severity": state.results["severity"],
                 "dimensions": dimension_details,
             }
+
+            # 保存问卷记录到文件
+            save_game_record(game_id, state)
 
             delete_game(game_id)
             return jsonify(result_data)

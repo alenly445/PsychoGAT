@@ -464,12 +464,6 @@ body {
   gap: 20px;
 }
 
-.result-icon {
-  font-size: 3rem;
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
 .result-score-ring {
   position: relative;
   width: 140px;
@@ -514,27 +508,6 @@ body {
 .result-score-num .total {
   font-size: 0.8rem;
   color: var(--text-secondary);
-}
-
-.result-level {
-  font-family: var(--font-story);
-  font-size: 1.3rem;
-  font-weight: 600;
-  padding: 8px 24px;
-  border-radius: 50px;
-  display: inline-block;
-}
-
-.level-normal { color: var(--accent-teal); background: rgba(90, 200, 176, 0.1); }
-.level-mild { color: #e8c84b; background: rgba(232, 200, 75, 0.1); }
-.level-moderate { color: #e8944b; background: rgba(232, 148, 75, 0.1); }
-.level-severe { color: var(--accent-rose); background: rgba(212, 107, 130, 0.1); }
-
-.result-recommendation {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  max-width: 450px;
 }
 
 .result-details {
@@ -687,77 +660,31 @@ body {
 }
 
 .age-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
+  padding: 14px 20px;
   background: var(--bg-card);
   border: 1px solid var(--border-glow);
   border-radius: var(--radius);
   cursor: pointer;
   transition: all var(--transition);
-  text-align: left;
-  position: relative;
-  overflow: hidden;
-}
-
-.age-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--accent-gold-dim), transparent);
-  opacity: 0;
-  transition: opacity var(--transition);
-}
-
-.age-card:hover::before {
-  opacity: 1;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  letter-spacing: 1px;
 }
 
 .age-card:hover {
   border-color: var(--accent-gold);
-  transform: translateX(6px);
+  background: var(--accent-gold-dim);
+  transform: translateX(4px);
   box-shadow: var(--shadow);
 }
 
-.age-card-icon {
-  font-size: 2rem;
-  line-height: 1;
-  position: relative;
-  z-index: 1;
-  width: 44px;
-  text-align: center;
-}
-
-.age-card-info {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-}
-
-.age-card-label {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.age-card-range {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.age-card-arrow {
-  font-size: 1.2rem;
-  color: var(--text-muted);
-  transition: transform var(--transition);
-  position: relative;
-  z-index: 1;
-}
-
-.age-card:hover .age-card-arrow {
-  transform: translateX(4px);
-  color: var(--accent-gold);
+.age-card.selected {
+  border-color: var(--accent-gold);
+  background: var(--accent-gold-dim);
+  box-shadow: 0 0 20px rgba(212, 168, 75, 0.15);
 }
 
 /* ===== Theme Selection ===== */
@@ -850,33 +777,6 @@ body {
   line-height: 1.3;
 }
 
-/* ===== Topic Input Row ===== */
-.topic-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.topic-row input {
-  flex: 1;
-  padding: 12px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-glow);
-  border-radius: var(--radius);
-  color: var(--text-primary);
-  font-family: var(--font-ui);
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color var(--transition);
-}
-
-.topic-row input:focus {
-  border-color: var(--accent-gold);
-}
-
-.topic-row button {
-  white-space: nowrap;
-}
 
 /* ===== Scrollbar for Webkit ===== */
 ::-webkit-scrollbar { width: 4px; }
@@ -905,7 +805,6 @@ body {
   .age-title { font-size: 1.6rem; }
   .age-grid { gap: 10px; }
   .age-card { padding: 14px 16px; }
-  .age-card-icon { font-size: 1.6rem; width: 36px; }
 
   /* Theme screen responsive */
   .theme-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -913,8 +812,6 @@ body {
   .theme-card-icon { font-size: 1.3rem; }
   .theme-card-label { font-size: 0.75rem; }
   .theme-card-desc { display: none; }
-  .topic-row { flex-direction: column; }
-  .topic-row button { width: 100%; }
 }
 </style>
 </head>
@@ -930,47 +827,25 @@ body {
   <div id="screen-age" class="screen active">
     <div class="age-title">PsychoGAT</div>
     <div class="age-subtitle">— 沉浸式心灵探索 —</div>
+
+    <!-- 名字输入（必填，放在年龄上方） -->
+    <div class="name-field" style="width:100%;max-width:440px;text-align:left;margin-bottom:24px">
+      <label for="userName" style="display:block;font-size:0.78rem;color:var(--text-secondary);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">
+        你的名字 *
+      </label>
+      <input id="userName" type="text" placeholder="请输入你的名字" maxlength="20" required
+        style="width:100%;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-glow);border-radius:var(--radius);color:var(--text-primary);font-family:var(--font-ui);font-size:0.95rem;outline:none;transition:border-color 0.35s">
+    </div>
+
+    <div style="font-size:0.78rem;color:var(--text-secondary);margin-bottom:10px;letter-spacing:1px;text-transform:uppercase">
+      选择年龄段
+    </div>
     <div class="age-grid" id="ageGrid">
-      <div class="age-card" data-age="child" onclick="selectAge('child')">
-        <div class="age-card-icon">🧒</div>
-        <div class="age-card-info">
-          <div class="age-card-label">小小探险家</div>
-          <div class="age-card-range">6–12 岁 · 充满好奇与想象</div>
-        </div>
-        <div class="age-card-arrow">→</div>
-      </div>
-      <div class="age-card" data-age="teen" onclick="selectAge('teen')">
-        <div class="age-card-icon">🌟</div>
-        <div class="age-card-info">
-          <div class="age-card-label">青春少年</div>
-          <div class="age-card-range">13–17 岁 · 热血与梦想交织</div>
-        </div>
-        <div class="age-card-arrow">→</div>
-      </div>
-      <div class="age-card" data-age="young" onclick="selectAge('young')">
-        <div class="age-card-icon">🌆</div>
-        <div class="age-card-info">
-          <div class="age-card-label">风华正茂</div>
-          <div class="age-card-range">18–30 岁 · 探索世界的无限可能</div>
-        </div>
-        <div class="age-card-arrow">→</div>
-      </div>
-      <div class="age-card" data-age="middle" onclick="selectAge('middle')">
-        <div class="age-card-icon">🌳</div>
-        <div class="age-card-info">
-          <div class="age-card-label">沉稳人生</div>
-          <div class="age-card-range">31–50 岁 · 在阅历中沉淀智慧</div>
-        </div>
-        <div class="age-card-arrow">→</div>
-      </div>
-      <div class="age-card" data-age="elder" onclick="selectAge('elder')">
-        <div class="age-card-icon">🌅</div>
-        <div class="age-card-info">
-          <div class="age-card-label">岁月静好</div>
-          <div class="age-card-range">51 岁以上 · 在时光深处品味人生</div>
-        </div>
-        <div class="age-card-arrow">→</div>
-      </div>
+      <div class="age-card" data-age="child" onclick="selectAge('child')">6–12 岁</div>
+      <div class="age-card" data-age="teen" onclick="selectAge('teen')">13–17 岁</div>
+      <div class="age-card" data-age="young" onclick="selectAge('young')">18–30 岁</div>
+      <div class="age-card" data-age="middle" onclick="selectAge('middle')">31–50 岁</div>
+      <div class="age-card" data-age="elder" onclick="selectAge('elder')">51 岁以上</div>
     </div>
     <div class="start-footer">
       探索内心的微光 · 基于 PsychoGAT 框架
@@ -989,13 +864,7 @@ body {
         </div>
         <div class="theme-label" id="themeLabel">选择故事主题</div>
         <div class="theme-grid" id="themeGrid"></div>
-        <div class="form-group">
-          <label for="gameTopic">故事主题（可选）</label>
-          <div class="topic-row">
-            <input id="gameTopic" type="text" value="疗愈之旅" placeholder="输入具体主题…">
-            <button class="btn-primary" id="btnStart" onclick="startGame()">开始旅程</button>
-          </div>
-        </div>
+        <button class="btn-primary" id="btnStart" onclick="startGame()">开始旅程</button>
       </div>
     </form>
     <div class="start-footer">
@@ -1045,7 +914,6 @@ body {
 
   <!-- RESULT SCREEN -->
   <div id="screen-result" class="screen">
-    <div class="result-icon" id="resultIcon">🔮</div>
     <div class="result-score-ring" id="scoreRing">
       <svg width="140" height="140" viewBox="0 0 140 140">
         <circle class="bg" cx="70" cy="70" r="60"/>
@@ -1057,8 +925,6 @@ body {
         <span class="total">/ 9</span>
       </div>
     </div>
-    <div class="result-level" id="resultLevel">—</div>
-    <div class="result-recommendation" id="resultRecommendation"></div>
     <div class="result-summary">
       <div class="result-summary-item">
         <span class="num" id="healthyCount">0</span>
@@ -1143,13 +1009,6 @@ const LOADING_MESSAGES = [
   '星光照亮了前方的道路',
   '故事正在慢慢展开',
 ];
-
-const LEVEL_CONFIG = {
-  '正常范围':     { icon: '🌿', cls: 'level-normal' },
-  '轻度抑郁倾向': { icon: '🌙', cls: 'level-mild' },
-  '中重度抑郁倾向': { icon: '🌊', cls: 'level-moderate' },
-  '重度抑郁倾向': { icon: '🌪️', cls: 'level-severe' },
-};
 
 // ===== Age Group Config =====
 const AGE_GROUPS = {
@@ -1277,8 +1136,15 @@ async function startGame() {
   btn.disabled = true;
 
   const gameType = window._selectedTheme || '奇幻';
-  const gameTopic = document.getElementById('gameTopic').value.trim() || '疗愈之旅';
+  const gameTopic = gameType;
   const ageGroup = selectedAgeGroup;
+  const userName = document.getElementById('userName').value.trim();
+
+  if (!userName) {
+    showError('请先输入你的名字');
+    btn.disabled = false;
+    return;
+  }
 
   if (!ageGroup) {
     showError('请先选择年龄段');
@@ -1297,6 +1163,7 @@ async function startGame() {
         game_type: gameType,
         game_topic: gameTopic,
         age_group: ageGroup,
+        user_name: userName,
       }),
     });
 
@@ -1381,6 +1248,19 @@ async function makeChoice(choice) {
   document.getElementById('choice1').disabled = true;
   document.getElementById('choice2').disabled = true;
 
+  // 显示加载页：「下一段旅行生成中」
+  document.getElementById('loadingText').textContent = '下一段旅行生成中';
+  document.getElementById('loadingBar').style.width = '30%';
+  if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+  showScreen('screen-loading');
+
+  // 简单进度动画
+  let progress = 30;
+  loadingInterval = setInterval(() => {
+    progress = Math.min(progress + 5, 80);
+    document.getElementById('loadingBar').style.width = progress + '%';
+  }, 3000);
+
   try {
     const res = await fetch('/api/choice', {
       method: 'POST',
@@ -1389,6 +1269,9 @@ async function makeChoice(choice) {
     });
 
     const data = await res.json();
+
+    if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+    document.getElementById('loadingBar').style.width = '100%';
 
     if (!res.ok || data.error) {
       showError(data.error || '处理选择时出错');
@@ -1402,6 +1285,7 @@ async function makeChoice(choice) {
     }
 
   } catch (err) {
+    if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
     showError('网络连接失败，请检查服务器');
   }
 }
@@ -1409,12 +1293,6 @@ async function makeChoice(choice) {
 // ===== Render Results =====
 function renderResults(data) {
   const total = data.total_score;
-  const severity = data.severity || { level: '—', recommendation: '' };
-  const level = severity.level || '—';
-  const config = LEVEL_CONFIG[level] || { icon: '🔮', cls: '' };
-
-  // 图标
-  document.getElementById('resultIcon').textContent = config.icon;
 
   // Score circle animation
   const circle = document.getElementById('scoreCircle');
@@ -1425,15 +1303,6 @@ function renderResults(data) {
   setTimeout(() => {
     circle.style.strokeDashoffset = offset;
   }, 300);
-
-  // Level
-  const levelEl = document.getElementById('resultLevel');
-  levelEl.textContent = level;
-  levelEl.className = 'result-level ' + config.cls;
-
-  // Recommendation
-  document.getElementById('resultRecommendation').textContent =
-    severity.recommendation || '';
 
   // Count healthy vs depressed
   const dims = data.dimensions || [];

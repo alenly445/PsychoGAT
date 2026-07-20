@@ -165,6 +165,6 @@ def run_critic(
         len(result["reviews"][dim]["issues"])
         for dim in ["coherence", "bias", "omission"]
     )
-    print(f"  [评论家] 优化完成（发现 {total_issues} 个问题）✓")
+    print(f"  [评论家] 优化完成（发现 {total_issues} 个问题）[OK]")
 
     return result
