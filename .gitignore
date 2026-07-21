@@ -12,3 +12,7 @@ build/
 # IDE
 .vscode/
 .idea/
+
+# 问卷数据（服务器本地存储）
+data/
+logs/
